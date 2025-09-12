@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Выбор товара</title>
+    <link rel="stylesheet" href="../Style.css">
+    <link rel="stylesheet" href="ChooseStyle.css">
+</head>
+<body>
+    <div class="product-container">
+        <div class="slider">
+            <button class="slider-btn left" onclick="prevSlide()">&#8592;</button>
+            <img id="sliderImg" src="boom0.png" alt="Фото товара">
+            <button class="slider-btn right" onclick="nextSlide()">&#8594;</button>
+        </div>
+        <div class="product-info">
+            <div class="product-title">Название товара</div>
+            <div class="product-desc">
+                Здесь подробное описание товара
+            <div class="product-contacts">
+                Контакты для связи: <br>
+                Email: <br>
+                Телефон: 
+            </div>
+            <button style="background:#ed4956;color:#fff;border:none;border-radius:6px;padding:10px 24px;font-size:1rem;cursor:pointer;">Купить</button>
+        </div>
+        <div class="similar-title">Похожие товары</div>
+        <div class="similar-row">
+            <div class="similar-card">
+                <img src="boom1.png" alt="Товар 2">
+                <h4>Товар 2</h4>
+                <p>Краткое описание товара</p>
+                <button id="chooseProduct">Купить</button>
+            </div>
+            <div class="similar-card">
+                <img src="boom2.png" alt="Товар 3">
+                <h4>Товар 3</h4>
+                <p>Краткое описание товара</p>
+                <button id="chooseProduct">Купить</button>
+            </div>
+            <div class="similar-card">
+                <img src="boom3.png" alt="Товар 4">
+                <h4>Товар 4</h4>
+                <p>Краткое описание товара</p>
+                <button id="chooseProduct">Купить</button>
+            </div>
+        </div>
+    </div>
+    <script src="ChooseScript.js"></script>  
+    <script src="../Script.js"></script>
+</body>
+</html>
