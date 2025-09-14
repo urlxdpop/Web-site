@@ -4,8 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <title>Профиль пользователя</title>
-    <link rel="stylesheet" href="../Style.css">
     <link rel="stylesheet" href="ProfileStyle.css">
+    <link rel="stylesheet" href="../Style.css">
+    
 </head>
 
 <body>
@@ -13,7 +14,7 @@
 
     <div class="profile-container">
         <div class="profile-header">
-            <img class="profile-avatar" src="profile.png" alt="Аватар пользователя">
+            <img class="profile-main-avatar" src="profile.png" alt="Аватар пользователя">
             <div class="profile-info">
                 <div class="profile-name">Имя пользователя</div>
                 <div class="profile-desc">Описание профиля</div>
@@ -27,27 +28,49 @@
         <div class="products-title">Товары</div>
         <div class="products-row">
             <div class="product-card">
-                <img src="../UI0.png" alt="Товар 1">
-                <h4>Товар 1</h4>
-                <p>Описание товара 1</p>
-                <button>Купить</button>
-            </div>
-            <div class="product-card">
-                <img src="../UI1.png" alt="Товар 2">
+
+                <img src="../UI1.png" alt="product2">
                 <h4>Товар 2</h4>
-                <p>Описание товара 2</p>
-                <button>Купить</button>
+                <div class="product-author">
+                    <img src="../Profile/profile.png" alt="Аватар автора">
+                    <a href="../Profile/profile.html">Nikita</a>
+                </div>
+                <p>Описание товара</p>
+
+                <button class="chooseProduct">Купить</button>
+
             </div>
             <div class="product-card">
-                <img src="../UI2.png" alt="Товар 3">
-                <h4>Товар 3</h4>
-                <p>Описание товара 3</p>
-                <button>Купить</button>
+
+                <img src="../UI3.png" alt="product2">
+                <h4>Товар 2</h4>
+                <div class="product-author">
+                    <img src="../Profile/profile.png" alt="Аватар автора">
+                    <a href="../Profile/profile.html">Nikita</a>
+                </div>
+                <p>Описание товара</p>
+
+                <button class="chooseProduct">Купить</button>
+
+            </div>
+            <div class="product-card">
+
+                <img src="../UI2.png" alt="product2">
+                <h4>Товар 2</h4>
+                <div class="product-author">
+                    <img src="../Profile/profile.png" alt="Аватар автора">
+                    <a href="../Profile/profile.html">Nikita</a>
+                </div>
+                <p>Описание товара</p>
+
+                <button class="chooseProduct">Купить</button>
+
             </div>
         </div>
     </div>
     <iframe src="../HeaderFooter/Footer.html"></iframe>
-    <script src="../Script.js"></script>
+    <script src="Script.js"></script>
+
 </body>
 
 </html>

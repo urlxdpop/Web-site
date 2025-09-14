@@ -30,7 +30,7 @@ header {
 
 .top-bar button:hover {
     background: #f1f1f1;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .main-layout {
@@ -94,9 +94,9 @@ main {
     background: #fff;
     border: 1px solid #dbdbdb;
     border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     padding: 16px;
-    width: 220px;
+    width: 30%;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
@@ -106,7 +106,7 @@ main {
 }
 
 .product-card:hover {
-    box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.10);
 }
 
 .product-card img {
@@ -161,6 +161,35 @@ footer {
 }
 
 iframe {
-    border: none;
-    width: 100%;
+  width: 100%;
+  border: none;
+  overflow: hidden; /* Полосы прокрутки будут скрыты */
+}
+
+.product-author {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    gap: 8px;
+}
+
+.product-author img {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1px solid #dbdbdb;
+    object-fit: cover;
+}
+
+.product-author a {
+    color: #ed4956;
+    text-decoration: none;
+    font-size: 0.98rem;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.product-author a:hover {
+    color: #d7374a;
+    text-decoration: underline;
 }

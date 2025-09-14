@@ -11,6 +11,15 @@
 <body>
     <iframe src="../HeaderFooter/Header.html"></iframe>
     <div class="product-container">
+        <div class="author-block">
+            <img src="../Profile/profile.png" alt="Аватар автора">
+            <div class="author-info">
+                <div class="author-name">
+                    Автор: <a href="../Profile/profile.html" style="color:#ed4956;text-decoration:none;">Имя</a>
+                </div>
+                <div class="author-desc">Описание автора</div>
+            </div>
+        </div>
         <div class="slider">
             <button class="slider-btn left" onclick="prevSlide()">&#8592;</button>
             <img id="sliderImg" src="boom0.png" alt="Фото товара">
@@ -30,31 +39,51 @@
             </div>
             <div class="similar-title">Похожие товары</div>
             <div class="similar-row">
-                <div class="similar-card">
-                    <img src="boom1.png" alt="Товар 2">
+                <div class="product-card">
+
+                    <img src="../UI1.png" alt="product2">
                     <h4>Товар 2</h4>
-                    <p>Краткое описание товара</p>
-                    <button id="chooseProduct">Купить</button>
+                    <div class="product-author">
+                        <img src="../Profile/profile.png" alt="Аватар автора">
+                        <a href="../Profile/profile.html">Nikita</a>
+                    </div>
+                    <p>Описание товара</p>
+
+                    <button class="chooseProduct">Купить</button>
+
                 </div>
-                <div class="similar-card">
-                    <img src="boom2.png" alt="Товар 3">
-                    <h4>Товар 3</h4>
-                    <p>Краткое описание товара</p>
-                    <button id="chooseProduct">Купить</button>
+                <div class="product-card">
+
+                    <img src="../UI3.png" alt="product2">
+                    <h4>Товар 2</h4>
+                    <div class="product-author">
+                        <img src="../Profile/profile.png" alt="Аватар автора">
+                        <a href="../Profile/profile.html">Nikita</a>
+                    </div>
+                    <p>Описание товара</p>
+
+                    <button class="chooseProduct">Купить</button>
+
                 </div>
-                <div class="similar-card">
-                    <img src="boom3.png" alt="Товар 4">
-                    <h4>Товар 4</h4>
-                    <p>Краткое описание товара</p>
-                    <button id="chooseProduct">Купить</button>
+                <div class="product-card">
+
+                    <img src="../UI2.png" alt="product2">
+                    <h4>Товар 2</h4>
+                    <div class="product-author">
+                        <img src="../Profile/profile.png" alt="Аватар автора">
+                        <a href="../Profile/profile.html">Nikita</a>
+                    </div>
+                    <p>Описание товара</p>
+
+                    <button class="chooseProduct">Купить</button>
+
                 </div>
             </div>
         </div>
 
-        <Iframe src="../HeaderFooter/Footer.html"></Iframe>
+        <iframe src="../HeaderFooter/Footer.html"></iframe>
 
         <script src="ChooseScript.js"></script>
-        <script src="../Script.js"></script>
 </body>
 
 </html>

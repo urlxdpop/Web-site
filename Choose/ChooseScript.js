@@ -18,3 +18,11 @@ function nextSlide() {
     current = (current + 1) % images.length;
     showSlide(current);
 }
+
+
+const buttons = document.getElementsByClassName('chooseProduct');
+for (let btn of buttons) {
+  btn.addEventListener('click', () => {
+    window.location.href = '../Choose/ChooseProduct.html';
+  });
+}

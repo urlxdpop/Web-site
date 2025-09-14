@@ -143,3 +143,33 @@
 .similar-card button:hover {
     background: #d7374a;
 }
+
+.author-block {
+    display: flex;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.author-block img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 2px solid #dbdbdb;
+    margin-right: 16px;
+}
+
+.author-block .author-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.author-block .author-name {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #262626;
+}
+
+.author-block .author-desc {
+    font-size: 0.98rem;
+    color: #888;
+}
