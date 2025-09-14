@@ -159,3 +159,8 @@ footer {
 .footer-info p {
     margin: 4px 0;
 }
+
+iframe {
+    border: none;
+    width: 100%;
+}
