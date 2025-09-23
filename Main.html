@@ -4,90 +4,30 @@
 <head>
     <meta charset="UTF-8">
     <title>Магазин цифровых товаров</title>
-    <link rel="stylesheet" href="Style.css">
+    <link rel="stylesheet" href="./Style.css">
 </head>
 
 <body>
-    <iframe src="HeaderFooter/Header.html"></iframe>
+    <iframe src="./HeaderFooter/Header.html"></iframe>
     <div class="main-layout">
         <aside class="sidebar left">
             <h3>Категории</h3>
-            <ul>
-                <li>Игры</li>
-                <li>Программы</li>
-                <li>Музыка</li>
-                <li>Книги</li>
-                <li>Видео</li>
+            <ul id="categoryList">
+                <li data-category="Все">Все</li>
+                <li data-category="Игры">Игры</li>
+                <li data-category="Приложение">Приложения</li>
+                <li data-category="Книги">Книги</li>
             </ul>
         </aside>
         <main>
-            <div class="products-row">
-                <div class="product-card">
-
-                    <img src="UI1.png" alt="product2">
-                    <h4>Товар 2</h4>
-                    <div class="product-author">
-                        <img src="Profile/profile.png" alt="Аватар автора">
-                        <a href="Profile/profile.html">Nikita</a>
-                    </div>
-                    <p>Описание товара</p>
-
-                    <button class="chooseProduct">Купить</button>
-
-                </div>
-                <div class="product-card">
-
-                    <img src="UI3.png" alt="product2">
-                    <h4>Товар 2</h4>
-                    <div class="product-author">
-                        <img src="Profile/profile.png" alt="Аватар автора">
-                        <a href="Profile/profile.html">Nikita</a>
-                    </div>
-                    <p>Описание товара</p>
-
-                    <button class="chooseProduct">Купить</button>
-
-                </div>
-                <div class="product-card">
-
-                    <img src="UI2.png" alt="product2">
-                    <h4>Товар 2</h4>
-                    <div class="product-author">
-                        <img src="Profile/profile.png" alt="Аватар автора">
-                        <a href="Profile/profile.html">Nikita</a>
-                    </div>
-                    <p>Описание товара</p>
-
-                    <button class="chooseProduct">Купить</button>
-
-                </div>
-                <div class="product-card">
-
-                    <img src="UI0.png" alt="product2">
-                    <h4>Товар 2</h4>
-                    <div class="product-author">
-                        <img src="Profile/profile.png" alt="Аватар автора">
-                        <a href="Profile/profile.html">Nikita</a>
-                    </div>
-                    <p>Описание товара</p>
-
-                    <button class="chooseProduct">Купить</button>
-
-                </div>
-                <div class="product-card">
-
-                    <img src="UI4.png" alt="product2">
-                    <h4>Товар 2</h4>
-                    <div class="product-author">
-                        <img src="Profile/profile.png" alt="Аватар автора">
-                        <a href="Profile/profile.html">Nikita</a>
-                    </div>
-                    <p>Описание товара</p>
-
-                    <button class="chooseProduct">Купить</button>
-
-                </div>
+            <div class="searchSortBar" >
+                <input type="text" id="searchInput" placeholder="Поиск товара..." style="flex:1;padding:8px;">
+                <select id="sortSelect" style="padding:8px;">
+                    <option value="title">По названию</option>
+                    <option value="author">По автору</option>
+                </select>
             </div>
+            <div class="products-row"></div>
         </main>
         <aside class="sidebar right">
             <h3>Популярное</h3>
@@ -96,8 +36,9 @@
             </ul>
         </aside>
     </div>
-    <iframe src="HeaderFooter/Footer.html"></iframe>
-    <script src="Script.js"></script>
+    <iframe src="./HeaderFooter/Footer.html"></iframe>
+
+    <script type="module" src="./Script.js"></script>
 </body>
 
 </html>

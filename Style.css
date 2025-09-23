@@ -161,9 +161,10 @@ footer {
 }
 
 iframe {
-  width: 100%;
-  border: none;
-  overflow: hidden; /* Полосы прокрутки будут скрыты */
+    width: 100%;
+    border: none;
+    overflow: hidden;
+    /* Полосы прокрутки будут скрыты */
 }
 
 .product-author {
@@ -192,4 +193,10 @@ iframe {
 .product-author a:hover {
     color: #d7374a;
     text-decoration: underline;
+}
+
+.searchSortBar {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
 }

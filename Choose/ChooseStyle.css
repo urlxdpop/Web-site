@@ -107,6 +107,11 @@
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.10);
 }
 
+#similar-avatar{
+    width: 30px;
+    height: 30px;
+}
+
 .similar-card img {
     width: 120px;
     height: 80px;
@@ -172,4 +177,19 @@
 .author-block .author-desc {
     font-size: 0.98rem;
     color: #888;
+}
+
+.author-a {
+    color: #ed4956;
+    text-decoration: none;
+}
+
+.buyButton {
+    background: #ed4956;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 24px;
+    font-size: 1rem;
+    cursor: pointer;
 }
