@@ -53,3 +53,7 @@ h3 {
     width: 100%;
     margin: 24px 0 8px 0;
 }
+
+.sidebar {
+    width: 500px;
+}

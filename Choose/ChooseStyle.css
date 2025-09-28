@@ -193,3 +193,13 @@
     font-size: 1rem;
     cursor: pointer;
 }
+
+.favButton {
+    background: #ed4956;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 24px;
+    font-size: 1rem;
+    cursor: pointer;
+}
