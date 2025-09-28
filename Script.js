@@ -22,6 +22,7 @@ function renderProducts() {
           <img src="${product.author.avatar}" alt="Аватар автора">
           <a href="#" class="author-link" data-author-id="${product.author.id}">${product.author.name}</a>
         </div>
+        <h5>Цена: ${product.price} руб.</h5>
         <p>${product.description}</p>
         <button class="chooseProduct" data-id="${product.id}">Купить</button>
       </div>
@@ -44,6 +45,8 @@ function renderProducts() {
       window.location.href = './Profile/profile.html';
     });
   });
+
+  document.getElementById('resultCount').innerText = `Найдено товаров: ${filteredProducts.length}`;
 }
 
 function filterAndSortProducts() {

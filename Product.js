@@ -14,10 +14,12 @@ class Product {
     this.title = title;
     this.mainImage = mainImage;
     this.type = type;
+    this.price = Math.floor(Math.random() * 1000); // Random price for demonstration
     this.description = description;
     this.author = author; // Author instance
     this.images = images;
     this.similar = similar;
+    this.buy = false;
   }
 }
 

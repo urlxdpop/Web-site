@@ -11,3 +11,10 @@ if (mainBtn) {
     window.top.location.href = '../Main.html';
   };
 }
+
+const saveBtn = document.getElementById('Save');
+if (saveBtn) {
+  saveBtn.onclick = function() {
+    window.top.location.href = '../Save/Saved.html';
+  };
+}

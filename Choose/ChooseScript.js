@@ -63,6 +63,7 @@ function renderProductPage() {
           <img id="similar-avatar" src="../${sim.author.avatar}" alt="Аватар автора">
           <a href="../Profile/profile.html" class="author-link" data-author-id="${sim.author.id}">${sim.author.name}</a>
         </div>
+        <h5>Цена: ${sim.price} руб.</h5>
         <p>${sim.description}</p>
         <button class="chooseProduct" data-id="${sim.id}">Купить</button>
       </div>
@@ -87,3 +88,25 @@ function renderProductPage() {
 }
 
 document.addEventListener('DOMContentLoaded', renderProductPage);
+
+document.querySelector('.buyButton').addEventListener('click', () => {
+  const id = localStorage.getItem('selectedProductId');
+  let bought = JSON.parse(localStorage.getItem('boughtProducts') || '[]');
+  if (!bought.includes(id)) {
+    bought.push(id);
+    localStorage.setItem('boughtProducts', JSON.stringify(bought));
+  }
+  alert('Товар добавлен в библиотеку!');
+});
+
+document.querySelector('.favButton').addEventListener('click', () => {
+  const id = localStorage.getItem('selectedProductId');
+  let favs = JSON.parse(localStorage.getItem('favProducts') || '[]');
+  if (!favs.includes(id)) {
+    favs.push(id);
+    localStorage.setItem('favProducts', JSON.stringify(favs));
+    alert('Товар добавлен в избранное!');
+  } else {
+    alert('Товар уже в избранном!');
+  }
+});
