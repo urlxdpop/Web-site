@@ -9,12 +9,12 @@
 <body>
     <div class="auth-container">
         <h2>Вход</h2>
-        <form>
-            <input type="text" placeholder="Имя пользователя или Email" required>
-            <input type="password" placeholder="Пароль" required>
-            <button type="submit">Войти</button>
+        <form action="login.php" method="post">
+            <input type="text" name="email_or_username" placeholder="Имя пользователя или Email" required>
+            <input type="password" name="password" placeholder="Пароль" required>
+            <button type="submit" name="action" value="login">Войти</button>
         </form>
         <a class="switch-link" href="Reg.html">Нет аккаунта? Зарегистрироваться</a>
-    </div>  
+    </div>
 </body>
 </html>

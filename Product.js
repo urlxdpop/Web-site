@@ -26,16 +26,16 @@ class Product {
 export const authors = [
   new Author({
     id: 1,
-    name: "Nikita",
+    name: "Nia",
     desc: "Описание автора",
-    avatar: "../Profile/profile.png",
+    avatar: "#",
     contacts: { email: "em", telegram: "@wdas", phone: "911" }
   }),
   new Author({
     id: 2,
     name: "Killjoy",
     desc: "Описание автора",
-    avatar: "../UI1.png",
+    avatar: "#",
     contacts: { email: "em", telegram: "@wdas", phone: "911" }
   })
 ];
