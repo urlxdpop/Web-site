@@ -73,11 +73,25 @@ async function renderMyProfile() {
 
 document.addEventListener('DOMContentLoaded', renderMyProfile);
 
+// добавляем логику выхода и создания товара
 const logoutBtn = document.getElementById('logoutBtn');
 if (logoutBtn) {
   logoutBtn.addEventListener('click', () => {
-    // удалить cookie user_id и перенаправить на главную
     document.cookie = 'user_id=; Max-Age=0; path=/';
     window.top.location.href = '../Main.html';
+  });
+}
+
+const createBtn = document.getElementById('createProductBtn');
+if (createBtn) {
+  createBtn.addEventListener('click', () => {
+    // проверяем cookie и перенаправляем
+    const v = document.cookie.match('(^|;)\\s*user_id\\s*=\\s*([^;]+)');
+    const uid = v ? v.pop() : null;
+    if (!uid || uid === '0') {
+      window.top.location.href = '../Register/Login.html';
+    } else {
+      window.location.href = '../createContent/CreatorForm.html';
+    }
   });
 }

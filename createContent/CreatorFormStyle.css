@@ -1,0 +1,61 @@
+/* Стили формы создания товара */
+.create-container {
+  max-width: 800px;
+  margin: 40px auto;
+  background: #fff;
+  border: 1px solid #dbdbdb;
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.create-container h2 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  color: #262626;
+}
+
+#createForm label {
+  display: block;
+  margin-bottom: 12px;
+  font-size: 0.95rem;
+  color: #444;
+}
+
+#createForm input[type="text"],
+#createForm input[type="number"],
+#createForm select,
+#createForm textarea,
+#createForm input[type="file"] {
+  display: block;
+  width: 100%;
+  margin-top: 6px;
+  padding: 10px;
+  border: 1px solid #dbdbdb;
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.form-actions button {
+  padding: 10px 18px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+
+.form-actions button[type="submit"] {
+  background: #ed4956;
+  color: #fff;
+}
+
+.form-actions button#cancelBtn {
+  background: #fff;
+  border: 1px solid #dbdbdb;
+  color: #333;
+}

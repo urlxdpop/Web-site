@@ -19,7 +19,6 @@ if ($userId) {
             $stmt->execute();
             $stmt->bind_result($dbAvatar);
             if ($stmt->fetch() && $dbAvatar) {
-                // avatar в БД хранится как относительный путь от корня, например "Profile/avatars/..."
                 $avatarSrc = '../' . ltrim($dbAvatar, '/');
             }
             $stmt->close();

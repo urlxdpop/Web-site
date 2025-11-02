@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <title>Создать товар</title>
+  <link rel="stylesheet" href="../Style.css">
+  <link rel="stylesheet" href="CreatorFormStyle.css">
+</head>
+<body>
+  <iframe src="../HeaderFooter/Header.php"></iframe>
+
+  <div class="create-container">
+    <h2>Создать новый товар</h2>
+    <form id="createForm" action="CreatorFormLoadIn.php" method="post" enctype="multipart/form-data">
+      <input type="hidden" name="author" id="authorInput" value="">
+      <label>Название (title)
+        <input type="text" name="title" required>
+      </label>
+      <label>Главная картинка (MainImage)
+        <input type="file" name="mainImage" accept="image/*" required>
+      </label>
+      <label>Тип
+        <select name="type" required>
+          <option value="Игра">Игра</option>
+          <option value="Приложение">Приложение</option>
+          <option value="Книга">Книга</option>
+        </select>
+      </label>
+      <label>Цена (сом.)
+        <input type="number" name="price" min="0" step="0.01" required>
+      </label>
+      <label>Описание
+        <textarea name="description" rows="6"></textarea>
+      </label>
+      <label>Доп. изображения (можно выбрать несколько)
+        <input type="file" name="images[]" accept="./image/*" multiple>
+      </label>
+
+      <div class="form-actions">
+        <button type="submit" name="action" value="create">Опубликовать</button>
+        <button type="button" id="cancelBtn">Отмена</button>
+      </div>
+    </form>
+  </div>
+
+  <iframe src="../HeaderFooter/Footer.html"></iframe>
+  <script type="module" src="CreatorFormScript.js"></script>
+</body>
+</html>
