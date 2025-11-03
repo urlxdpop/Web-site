@@ -1,29 +1,14 @@
 <?php
+require_once __DIR__ . '/../ScriptsForBD/DBController.php';
 session_start();
 
-define('DB_HOST', 'localhost');
-define('DB_PORT', 3306);
-define('DB_USER', 'root');
-define('DB_PASS', '');
-define('DB_NAME', 'WebSite');
-
-$avatarSrc = '../Profile/profile.png'; // fallback
+$avatarSrc = '../Profile/profile.png';
 $userId = $_COOKIE['user_id'] ?? null;
 
 if ($userId) {
-    $mysqli = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_PORT);
-    if (!$mysqli->connect_error) {
-        $stmt = $mysqli->prepare("SELECT avatar FROM users WHERE id = ? LIMIT 1");
-        if ($stmt) {
-            $stmt->bind_param('i', $userId);
-            $stmt->execute();
-            $stmt->bind_result($dbAvatar);
-            if ($stmt->fetch() && $dbAvatar) {
-                $avatarSrc = '../' . ltrim($dbAvatar, '/');
-            }
-            $stmt->close();
-        }
-        $mysqli->close();
+    $avatar = DBController::getAvatarByUser(intval($userId));
+    if ($avatar) {
+        $avatarSrc = '../' . ltrim($avatar, '/');
     }
 }
 ?>

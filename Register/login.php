@@ -1,20 +1,7 @@
-
 <?php
 // Файл обработки логина
-define('DB_HOST', 'localhost');
-define('DB_PORT', 3306);
-define('DB_USER', 'root');
-define('DB_PASS', '');
-define('DB_NAME', 'WebSite');
-
+require_once __DIR__ . '/../ScriptsForBD/DBController.php';
 session_start();
-
-$mysqli = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_PORT);
-if ($mysqli->connect_error) {
-    http_response_code(500);
-    echo "DB connection error: " . $mysqli->connect_error;
-    exit;
-}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'login') {
     $identifier = trim($_POST['email_or_username'] ?? '');
@@ -26,15 +13,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'login
         exit;
     }
 
-    $stmt = $mysqli->prepare("SELECT id, password FROM Users WHERE email = ? OR username = ? LIMIT 1");
-    $stmt->bind_param('ss', $identifier, $identifier);
-    $stmt->execute();
-    $stmt->bind_result($id, $hash);
-    if ($stmt->fetch()) {
-        if (password_verify($password, $hash)) {
-            $_SESSION['user_id'] = $id;
-            setcookie('user_id', $id, time() + (86400 * 30), "/");
-            $stmt->close();
+    $user = DBController::getUserByEmailOrUsername($identifier);
+    if ($user) {
+        if (password_verify($password, $user['password'])) {
+            $_SESSION['user_id'] = $user['id'];
+            setcookie('user_id', $user['id'], time() + (86400 * 30), "/");
             header('Location: ../Main.html');
             exit;
         } else {
@@ -43,7 +26,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'login
     } else {
         $_SESSION['error'] = 'Пользователь не найден';
     }
-    $stmt->close();
     header('Location: Login.html');
     exit;
 }

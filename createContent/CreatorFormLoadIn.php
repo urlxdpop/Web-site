@@ -1,12 +1,7 @@
 <?php
 session_start();
+require_once __DIR__ . '/../ScriptsForBD/DBController.php';
 header('Content-Type: text/html; charset=utf-8');
-
-define('DB_HOST','localhost');
-define('DB_PORT',3306);
-define('DB_USER','root');
-define('DB_PASS','');
-define('DB_NAME','WebSite');
 
 $uid = $_SESSION['user_id'] ?? ($_COOKIE['user_id'] ?? null);
 if (!$uid || intval($uid) <= 0) {
@@ -14,15 +9,9 @@ if (!$uid || intval($uid) <= 0) {
     exit;
 }
 
-$mysqli = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_PORT);
-if ($mysqli->connect_error) {
-    echo "DB connection error";
-    exit;
-}
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'create') {
-    $title = trim($_POST['title'] ?? ' ');
-    $type = trim($_POST['type'] ?? ' ');
+    $title = trim($_POST['title'] ?? '');
+    $type = trim($_POST['type'] ?? '');
     $price = floatval($_POST['price'] ?? 0);
     $description = trim($_POST['description'] ?? '');
     $author = intval($_POST['author'] ?? $uid);
@@ -33,7 +22,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'creat
         exit;
     }
 
-    // папка для изображений
     $uploadDirRel = 'Content/images/';
     $uploadDir = __DIR__ . '/../' . $uploadDirRel;
     if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
@@ -63,38 +51,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'creat
 
     $imagesJson = json_encode($imagesArr, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
-    $stmt = $mysqli->prepare("INSERT INTO content (title, mainImage, type, price, description, images, author) VALUES (?, ?, ?, ?, ?, ?, ?)");
-    if (!$stmt) {
-        error_log("prepare error: " . $mysqli->error);
-        echo "Ошибка подготовки запроса";
-        exit;
-    }
-    $stmt->bind_param('sssdssi', $title, $mainImagePath, $type, $price, $description, $imagesJson, $author);
-    $stmt->close();
-
-    $stmt = $mysqli->prepare("INSERT INTO content (title, mainImage, type, price, description, images, author) VALUES (?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param('sssdssi', $title, $mainImagePath, $type, $price, $description, $imagesJson, $author);
-    // Note: due to PHP type string, use this fallback - if this fails, try string binding
-    $stmt->close();
-
-    // Simpler safe insertion using real_escape as fallback
-    $titleEsc = $mysqli->real_escape_string($title);
-    $mainImageEsc = $mysqli->real_escape_string($mainImagePath);
-    $typeEsc = $mysqli->real_escape_string($type);
-    $priceVal = floatval($price);
-    $descEsc = $mysqli->real_escape_string($description);
-    $imagesEsc = $mysqli->real_escape_string($imagesJson);
-    $authorVal = intval($author);
-
-    $sql = "INSERT INTO content (title, mainImage, type, price, description, images, author) VALUES ('{$titleEsc}','{$mainImageEsc}','{$typeEsc}', {$priceVal}, '{$descEsc}', '{$imagesEsc}', {$authorVal})";
-    if ($mysqli->query($sql)) {
-        $mysqli->close();
+    $ok = DBController::insertContent($title, $mainImagePath, $type, $price, $description, $imagesJson, $author);
+    if ($ok) {
         header('Location: ../Profile/MyProfile.html');
         exit;
     } else {
-        error_log("insert error: " . $mysqli->error);
+        error_log("insert content error");
         echo "Ошибка сохранения товара";
-        $mysqli->close();
         exit;
     }
 } else {
