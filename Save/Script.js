@@ -63,8 +63,7 @@ function renderLibrary() {
     document.querySelectorAll('.chooseProduct').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const id = btn.getAttribute('data-id');
-            localStorage.setItem('selectedProductId', id);
-            window.location.href = '../Choose/ChooseProduct.html';
+            window.location.href = `../Choose/ChooseProduct.html?id=${encodeURIComponent(id)}`;
         });
     });
 }

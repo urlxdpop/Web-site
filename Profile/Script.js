@@ -1,5 +1,3 @@
-import { products } from '../Product.js';
-
 function getCookie(name) {
   const v = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
   return v ? v.pop() : '';
@@ -10,7 +8,6 @@ async function renderMyProfile() {
   const url = selectedAuthorId ? `fileDB.php?id=${encodeURIComponent(selectedAuthorId)}` : 'fileDB.php';
   let resp;
   try {
-    // отправляем куки вместе с запросом
     resp = await fetch(url, { credentials: 'same-origin' });
     if (!resp.ok) {
       console.error('fileDB http error', resp.status);
@@ -32,28 +29,39 @@ async function renderMyProfile() {
 
     const row = document.querySelector('.products-row');
     row.innerHTML = '';
+
     const authorId = author.id;
-    products.filter(p => p.author && p.author.id == authorId).forEach(product => {
-      row.innerHTML += `
-        <div class="product-card">
-          <img src="../${product.mainImage}" alt="${product.title}">
-          <h4>${product.title}</h4>
-          <div class="product-author">
-            <img src="../${product.author.avatar}" alt="Аватар автора">
-            <a href="#" class="author-link" data-author-id="${product.author.id}">${product.author.name}</a>
-          </div>
-          <h5>Цена: ${product.price} руб.</h5>
-          <p>${product.description}</p>
-          <button class="chooseProduct" data-id="${product.id}">Купить</button>
-        </div>
-      `;
-    });
+    // загружаем товары автора через API
+    try {
+      const resp2 = await fetch(`../getProducts.php?author=${encodeURIComponent(authorId)}&limit=50`);
+      if (resp2.ok) {
+        const data2 = await resp2.json();
+        (data2.products || []).forEach(product => {
+          row.innerHTML += `
+            <div class="product-card">
+              <img src="../${product.mainImage}" alt="${product.title}">
+              <h4>${product.title}</h4>
+              <div class="product-author">
+                <img src="../${product.author.avatar || 'Profile/profile.png'}" alt="Аватар автора">
+                <a href="#" class="author-link" data-author-id="${product.author.id}">${product.author.name}</a>
+              </div>
+              <h5>Цена: ${product.price} руб.</h5>
+              <p>${product.description}</p>
+              <button class="chooseProduct" data-id="${product.id}">Посмотреть</button>
+            </div>
+          `;
+        });
+      } else {
+        console.warn('getProducts by author failed', resp2.status);
+      }
+    } catch (err) {
+      console.error('Ошибка загрузки товаров автора', err);
+    }
 
     document.querySelectorAll('.chooseProduct').forEach(btn => {
       btn.addEventListener('click', (e) => {
         const id = btn.getAttribute('data-id');
-        localStorage.setItem('selectedProductId', id);
-        window.location.href = '../Choose/ChooseProduct.html';
+        window.location.href = `../Choose/ChooseProduct.html?id=${encodeURIComponent(id)}`;
       });
     });
 

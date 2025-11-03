@@ -97,5 +97,75 @@ class DBController {
         $mysqli->close();
         return (bool)$ok;
     }
+
+    public static function getProducts(int $page = 1, int $limit = 20, ?int $author = null): array {
+        $offset = ($page - 1) * $limit;
+        $mysqli = self::connect();
+
+        if ($author !== null) {
+            $stmt = $mysqli->prepare("
+                SELECT c.*, u.username as author_name, u.avatar as author_avatar, u.descr as author_desc 
+                FROM content c 
+                LEFT JOIN users u ON c.author = u.id 
+                WHERE c.author = ?
+                ORDER BY c.id DESC 
+                LIMIT ? OFFSET ?");
+            if (!$stmt) { $mysqli->close(); return []; }
+            $stmt->bind_param('iii', $author, $limit, $offset);
+        } else {
+            $stmt = $mysqli->prepare("
+                SELECT c.*, u.username as author_name, u.avatar as author_avatar, u.descr as author_desc 
+                FROM content c 
+                LEFT JOIN users u ON c.author = u.id 
+                ORDER BY c.id DESC 
+                LIMIT ? OFFSET ?");
+            if (!$stmt) { $mysqli->close(); return []; }
+            $stmt->bind_param('ii', $limit, $offset);
+        }
+
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $products = [];
+        while ($row = $result->fetch_assoc()) {
+            $products[] = [
+                'id' => $row['id'],
+                'title' => $row['title'],
+                'mainImage' => $row['mainImage'],
+                'type' => $row['type'],
+                'price' => $row['price'],
+                'description' => $row['description'],
+                'images' => json_decode($row['images'], true),
+                'author' => [
+                    'id' => $row['author'],
+                    'name' => $row['author_name'],
+                    'desc' => $row['author_desc'],
+                    'avatar' => $row['author_avatar']
+                ]
+            ];
+        }
+        $stmt->close();
+        $mysqli->close();
+        return $products;
+    }
+
+    public static function getProductsCount(?int $author = null): int {
+        $mysqli = self::connect();
+        if ($author !== null) {
+            $stmt = $mysqli->prepare("SELECT COUNT(*) as cnt FROM content WHERE author = ?");
+            if (!$stmt) { $mysqli->close(); return 0; }
+            $stmt->bind_param('i', $author);
+            $stmt->execute();
+            $res = $stmt->get_result()->fetch_assoc();
+            $stmt->close();
+            $mysqli->close();
+            return (int)($res['cnt'] ?? 0);
+        } else {
+            $result = $mysqli->query("SELECT COUNT(*) as cnt FROM content");
+            if (!$result) { $mysqli->close(); return 0; }
+            $row = $result->fetch_assoc();
+            $mysqli->close();
+            return (int)($row['cnt'] ?? 0);
+        }
+    }
 }
 ?>

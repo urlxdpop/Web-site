@@ -5,86 +5,94 @@ for (let btn of buttons) {
   });
 }
 
-import { products } from './Product.js';
+import { getProducts } from './Product.js';
 
-let filteredProducts = [...products];
+let currentProducts = [];
+let currentPage = 1;
+let totalPages = 1;
 let selectedCategory = "Все";
 
+async function loadProducts(page = 1) {
+    const data = await getProducts(page);
+    currentProducts = data.products;
+    currentPage = data.page;
+    totalPages = data.pages;
+    renderProducts();
+}
+
 function renderProducts() {
-  const row = document.querySelector('.products-row');
-  row.innerHTML = '';
-  filteredProducts.forEach(product => {
-    row.innerHTML += `
-      <div class="product-card">
-        <img src="${product.mainImage}" alt="${product.title}">
-        <h4>${product.title}</h4>
-        <div class="product-author">
-          <img src="${product.author.avatar}" alt="Аватар автора">
-          <a href="#" class="author-link" data-author-id="${product.author.id}">${product.author.name}</a>
+    const row = document.querySelector('.products-row');
+    row.innerHTML = '';
+
+    currentProducts.forEach(product => {
+        row.innerHTML += `
+            <div class="product-card">
+                <img src="${product.mainImage}" alt="${product.title}">
+                <h4>${product.title}</h4>
+                <div class="product-author">
+                    <img src="${product.author.avatar || 'Profile/profile.png'}" alt="Аватар автора">
+                    <a href="#" class="author-link" data-author-id="${product.author.id}">${product.author.name}</a>
+                </div>
+                <h5>Цена: ${product.price} руб.</h5>
+                <p>${product.description}</p>
+                <button class="chooseProduct" data-id="${product.id}">Посмотреть</button>
+            </div>
+        `;
+    });
+
+    const paginationHtml = `
+        <div class="pagination" style="margin-top:20px;text-align:center;">
+            ${currentPage > 1 ? `<button onclick="prevPage()">←</button>` : ''}
+            <span>Страница ${currentPage} из ${totalPages}</span>
+            ${currentPage < totalPages ? `<button onclick="nextPage()">→</button>` : ''}
         </div>
-        <h5>Цена: ${product.price} руб.</h5>
-        <p>${product.description}</p>
-        <button class="chooseProduct" data-id="${product.id}">Купить</button>
-      </div>
     `;
-  });
+    row.insertAdjacentHTML('beforeend', paginationHtml);
 
-  document.querySelectorAll('.chooseProduct').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const id = btn.getAttribute('data-id');
-      localStorage.setItem('selectedProductId', id);
-      window.location.href = './Choose/ChooseProduct.html';
+    document.querySelectorAll('.chooseProduct').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const id = btn.getAttribute('data-id');
+            // Переходим на страницу товара с параметром id
+            window.location.href = `./Choose/ChooseProduct.html?id=${encodeURIComponent(id)}`;
+        });
     });
-  });
 
-  document.querySelectorAll('.author-link').forEach(link => {
-    link.addEventListener('click', (e) => {
-      e.preventDefault();
-      const authorId = link.getAttribute('data-author-id');
-      localStorage.setItem('selectedAuthorId', authorId);
-      window.location.href = './Profile/profile.html';
+    document.querySelectorAll('.author-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const authorId = link.getAttribute('data-author-id');
+            localStorage.setItem('selectedAuthorId', authorId);
+            window.location.href = './Profile/profile.html';
+        });
     });
-  });
 
-  document.getElementById('resultCount').innerText = `Найдено товаров: ${filteredProducts.length}`;
+    const rc = document.getElementById('resultCount');
+    if (rc) rc.innerText = `Найдено товаров: ${currentProducts.length}`;
 }
 
-function filterAndSortProducts() {
-  const searchValue = document.getElementById('searchInput').value.toLowerCase();
-  const sortValue = document.getElementById('sortSelect').value;
+window.prevPage = () => {
+    if (currentPage > 1) loadProducts(currentPage - 1);
+};
 
-  filteredProducts = products.filter(product => {
-    const matchesCategory = selectedCategory === "Все" || product.type === selectedCategory;
-    const matchesSearch = product.title.toLowerCase().includes(searchValue) ||
-      product.description.toLowerCase().includes(searchValue) ||
-      product.author.name.toLowerCase().includes(searchValue);
-    return matchesCategory && matchesSearch;
-  });
-
-  filteredProducts.sort((a, b) => {
-    if (sortValue === 'title') {
-      return a.title.localeCompare(b.title);
-    }
-    if (sortValue === 'author') {
-      return a.author.name.localeCompare(b.author.name);
-    }
-    return 0;
-  });
-
-  renderProducts();
-}
+window.nextPage = () => {
+    if (currentPage < totalPages) loadProducts(currentPage + 1);
+};
 
 document.addEventListener('DOMContentLoaded', () => {
-  renderProducts();
-  document.getElementById('searchInput').addEventListener('input', filterAndSortProducts);
-  document.getElementById('sortSelect').addEventListener('change', filterAndSortProducts);
+    loadProducts();
 
-  document.querySelectorAll('#categoryList li').forEach(li => {
-    li.addEventListener('click', () => {
-      selectedCategory = li.getAttribute('data-category');
-      filterAndSortProducts();
-      document.querySelectorAll('#categoryList li').forEach(el => el.style.color = '');
-      li.style.color = '#ed4956';
+    const si = document.getElementById('searchInput');
+    const ss = document.getElementById('sortSelect');
+    if (si) si.addEventListener('input', filterAndSortProducts);
+    if (ss) ss.addEventListener('change', filterAndSortProducts);
+
+    document.querySelectorAll('#categoryList li').forEach(li => {
+        li.addEventListener('click', () => {
+            selectedCategory = li.getAttribute('data-category');
+            loadProducts(1);
+            document.querySelectorAll('#categoryList li').forEach(el =>
+                el.style.color = '');
+            li.style.color = '#ed4956';
+        });
     });
-  });
 });
