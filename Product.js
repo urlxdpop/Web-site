@@ -27,7 +27,9 @@ export async function getProducts(page = 1, options = {}) {
   const category = options.category ? encodeURIComponent(options.category) : null;
   const sort = options.sort ? encodeURIComponent(options.sort) : null;
   const author = options.author ? encodeURIComponent(options.author) : null;
-  let url = `getProducts.php?page=${page}&limit=20`;
+
+  const base = new URL('getProducts.php', import.meta.url).href;
+  let url = `${base}?page=${page}&limit=20`;
   if (q) url += `&q=${q}`;
   if (category) url += `&category=${category}`;
   if (sort) url += `&sort=${sort}`;

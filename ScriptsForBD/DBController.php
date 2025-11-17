@@ -1,20 +1,24 @@
 <?php
-class DBController {
+class DBController
+{
     private static $cfg = [
         'host' => 'localhost',
         'port' => 3306,
         'user' => 'root',
         'pass' => '',
-        'db'   => 'WebSite',
+        'db' => 'WebSite',
         'charset' => 'utf8mb4'
     ];
 
-    private function __construct() {
-        $this->CreateUserTableIfNotExists();
-        $this->CreateContentTableIfNotExists();
+    public static function CreateTables()
+    {
+        self::CreateUserTableIfNotExists();
+        self::CreateContentTableIfNotExists();
+        self::CreateSavedTableIfNotExists();
     }
 
-    public static function connect(): mysqli {
+    public static function connect(): mysqli
+    {
         $c = new mysqli(self::$cfg['host'], self::$cfg['user'], self::$cfg['pass'], self::$cfg['db'], self::$cfg['port']);
         if ($c->connect_error) {
             throw new RuntimeException('DB connect error: ' . $c->connect_error);
@@ -23,7 +27,8 @@ class DBController {
         return $c;
     }
 
-    public static function getUserById(int $id): ?array {
+    public static function getUserById(int $id): ?array
+    {
         $mysqli = self::connect();
         $stmt = $mysqli->prepare("SELECT id, username, email, avatar, descr FROM users WHERE id = ? LIMIT 1");
         if (!$stmt) { $mysqli->close(); return null; }
@@ -35,21 +40,23 @@ class DBController {
         return $res;
     }
 
-    public static function getUserByEmailOrUsername(string $identifier): ?array {
+    public static function getUserByEmailOrUsername(string $identifier): ?array
+    {
         $mysqli = self::connect();
         $stmt = $mysqli->prepare("SELECT id, password FROM users WHERE email = ? OR username = ? LIMIT 1");
         if (!$stmt) { $mysqli->close(); return null; }
         $stmt->bind_param('ss', $identifier, $identifier);
         $stmt->execute();
-        $stmt->bind_result($id, $passwordHash);
-        $got = $stmt->fetch();
+        $result = $stmt->get_result();
+        $row = $result ? $result->fetch_assoc() : null;
         $stmt->close();
         $mysqli->close();
-        if (!$got) return null;
-        return ['id' => $id, 'password' => $passwordHash];
+        if (!$row) return null;
+        return ['id' => (int)$row['id'], 'password' => $row['password']];
     }
 
-    public static function userExistsByEmailOrUsername(string $email, string $username): bool {
+    public static function userExistsByEmailOrUsername(string $email, string $username): bool
+    {
         $mysqli = self::connect();
         $stmt = $mysqli->prepare("SELECT id FROM users WHERE email = ? OR username = ? LIMIT 1");
         if (!$stmt) { $mysqli->close(); return false; }
@@ -62,7 +69,8 @@ class DBController {
         return $exists;
     }
 
-    public static function createUser(string $username, string $email, string $passwordHash, string $avatarPath, string $descr): ?int {
+    public static function createUser(string $username, string $email, string $passwordHash, string $avatarPath, string $descr): ?int
+    {
         $mysqli = self::connect();
         $stmt = $mysqli->prepare("INSERT INTO users (username, email, password, avatar, descr) VALUES (?, ?, ?, ?, ?)");
         if (!$stmt) { $mysqli->close(); return null; }
@@ -75,24 +83,101 @@ class DBController {
         $id = $stmt->insert_id;
         $stmt->close();
         $mysqli->close();
+
+        self::createSavedRowForUser((int)$id);
+
         return $id;
     }
 
-    public static function getAvatarByUser(int $id): string {
+    public static function createSavedRowForUser(int $userId): bool
+    {
         $mysqli = self::connect();
-        $stmt = $mysqli->prepare("SELECT avatar FROM users WHERE id = ? LIMIT 1");
-        if (!$stmt) { $mysqli->close(); return ''; }
-        $stmt->bind_param('i', $id);
-        $stmt->execute();
-        $stmt->bind_result($avatar);
-        $got = $stmt->fetch();
+        $stmt = $mysqli->prepare("INSERT INTO saved (id_user, saved, buy) VALUES (?, '', '')");
+        if (!$stmt) { $mysqli->close(); return false; }
+        $stmt->bind_param('i', $userId);
+        $ok = $stmt->execute();
         $stmt->close();
         $mysqli->close();
-        if ($got && $avatar) return $avatar;
-        return '';
+        return (bool)$ok;
     }
 
-    public static function insertContent(string $title, string $mainImage, string $type, float $price, string $description, string $imagesJson, int $author): bool {
+    public static function getSavedRow(int $userId): ?array
+    {
+        $mysqli = self::connect();
+        $stmt = $mysqli->prepare("SELECT saved, buy FROM saved WHERE id_user = ? LIMIT 1");
+        if (!$stmt) { $mysqli->close(); return null; }
+        $stmt->bind_param('i', $userId);
+        $stmt->execute();
+        $res = $stmt->get_result()->fetch_assoc() ?: null;
+        $stmt->close();
+        $mysqli->close();
+        return $res;
+    }
+
+    public static function updateSavedRow(int $userId, string $saved, string $buy): bool
+    {
+        $mysqli = self::connect();
+        $stmt = $mysqli->prepare("UPDATE saved SET saved = ?, buy = ? WHERE id_user = ?");
+        if (!$stmt) { $mysqli->close(); return false; }
+        $stmt->bind_param('ssi', $saved, $buy, $userId);
+        $ok = $stmt->execute();
+        $stmt->close();
+        $mysqli->close();
+        return (bool)$ok;
+    }
+
+    public static function addToSaved(int $userId, int $productId): bool
+    {
+        $row = self::getSavedRow($userId);
+        if ($row === null) return false;
+        $savedStr = $row['saved'] ?? '';
+        $buyStr = $row['buy'] ?? '';
+
+        $savedArr = $savedStr === '' ? [] : array_filter(explode('*', $savedStr), 'strlen');
+        $buyArr = $buyStr === '' ? [] : array_filter(explode('*', $buyStr), 'strlen');
+
+        if (in_array((string)$productId, $buyArr, true) || in_array($productId, array_map('intval', $buyArr), true)) {
+            return false;
+        }
+
+        if (!in_array((string)$productId, $savedArr, true) && !in_array($productId, array_map('intval', $savedArr), true)) {
+            $savedArr[] = (string)$productId;
+            $newSaved = implode('*', $savedArr);
+            return self::updateSavedRow($userId, $newSaved, $buyStr);
+        }
+        return true;
+    }
+
+    public static function removeFromSaved(int $userId, int $productId): bool
+    {
+        $row = self::getSavedRow($userId);
+        if ($row === null) return false;
+        $savedArr = $row['saved'] === '' ? [] : array_filter(explode('*', $row['saved']), 'strlen');
+        $savedArr = array_values(array_filter($savedArr, function($v) use ($productId) { return (int)$v !== $productId; }));
+        $newSaved = $savedArr ? implode('*', $savedArr) : '';
+        return self::updateSavedRow($userId, $newSaved, $row['buy'] ?? '');
+    }
+
+    public static function addToBuy(int $userId, int $productId): bool
+    {
+        $row = self::getSavedRow($userId);
+        if ($row === null) return false;
+        $savedArr = $row['saved'] === '' ? [] : array_filter(explode('*', $row['saved']), 'strlen');
+        $buyArr = $row['buy'] === '' ? [] : array_filter(explode('*', $row['buy']), 'strlen');
+
+        $savedArr = array_values(array_filter($savedArr, function($v) use ($productId) { return (int)$v !== $productId; }));
+
+        if (!in_array((string)$productId, $buyArr, true) && !in_array($productId, array_map('intval', $buyArr), true)) {
+            $buyArr[] = (string)$productId;
+        }
+
+        $newSaved = $savedArr ? implode('*', $savedArr) : '';
+        $newBuy = $buyArr ? implode('*', $buyArr) : '';
+        return self::updateSavedRow($userId, $newSaved, $newBuy);
+    }
+
+    public static function insertContent(string $title, string $mainImage, string $type, float $price, string $description, string $imagesJson, int $author): bool
+    {
         $mysqli = self::connect();
         $stmt = $mysqli->prepare("INSERT INTO content (title, mainImage, type, price, description, images, author) VALUES (?, ?, ?, ?, ?, ?, ?)");
         if (!$stmt) { $mysqli->close(); return false; }
@@ -102,8 +187,50 @@ class DBController {
         $mysqli->close();
         return (bool)$ok;
     }
-
-    public static function getProducts(int $page = 1, int $limit = 20, ?int $author = null, ?string $q = null, ?string $category = null, ?string $sort = null): array {
+    public static function getProductsByIds(array $ids): array
+    {
+        $ids = array_filter(array_map('intval', $ids));
+        if (count($ids) === 0) return [];
+        $mysqli = self::connect();
+        $in = implode(',', $ids);
+        $sql = "
+            SELECT c.id, c.title, c.mainImage, c.type, c.price, c.description, c.images, c.author,
+                   u.username AS author_name, u.avatar AS author_avatar, u.descr AS author_desc
+            FROM content c
+            LEFT JOIN users u ON c.author = u.id
+            WHERE c.id IN ($in)
+        ";
+        $res = $mysqli->query($sql);
+        $out = [];
+        if ($res) {
+            while ($row = $res->fetch_assoc()) {
+                $out[] = [
+                    'id' => (int)$row['id'],
+                    'title' => $row['title'],
+                    'mainImage' => $row['mainImage'],
+                    'type' => $row['type'],
+                    'price' => (float)$row['price'],
+                    'description' => $row['description'],
+                    'images' => $row['images'] ? json_decode($row['images'], true) : [],
+                    'author' => [
+                        'id' => (int)$row['author'],
+                        'name' => $row['author_name'],
+                        'desc' => $row['author_desc'],
+                        'avatar' => $row['author_avatar']
+                    ]
+                ];
+            }
+            $res->free();
+        }
+        $mysqli->close();
+        $map = [];
+        foreach ($out as $p) $map[$p['id']] = $p;
+        $ordered = [];
+        foreach ($ids as $i) if (isset($map[$i])) $ordered[] = $map[$i];
+        return $ordered;
+    }
+    public static function getProducts(int $page = 1, int $limit = 20, ?int $author = null, ?string $q = null, ?string $category = null, ?string $sort = null): array
+    {
         $offset = max(0, ($page - 1) * $limit);
         $mysqli = self::connect();
 
@@ -192,7 +319,8 @@ class DBController {
         return $products;
     }
 
-    public static function getProductsCount(?int $author = null, ?string $q = null, ?string $category = null): int {
+    public static function getProductsCount(?int $author = null, ?string $q = null, ?string $category = null): int
+    {
         $mysqli = self::connect();
 
         $where = [];
@@ -200,13 +328,13 @@ class DBController {
         $params = [];
 
         if ($author !== null) {
-            $where[] = 'author = ?';
+            $where[] = 'content.author = ?';
             $types .= 'i';
             $params[] = $author;
         }
 
         if ($category !== null && $category !== '' && mb_strtolower($category) !== 'все') {
-            $where[] = 'type = ?';
+            $where[] = 'content.type = ?';
             $types .= 's';
             $params[] = $category;
         }
@@ -225,10 +353,7 @@ class DBController {
         }
 
         $stmt = $mysqli->prepare($sql);
-        if (!$stmt) {
-            $mysqli->close();
-            return 0;
-        }
+        if (!$stmt) { $mysqli->close(); return 0; }
 
         if (count($params) > 0) {
             $bind_names = [];
@@ -247,8 +372,8 @@ class DBController {
         return (int)($row['cnt'] ?? 0);
     }
 
-
-    public static function getProductById(int $id): ?array {
+    public static function getProductById(int $id): ?array
+    {
         $mysqli = self::connect();
         $stmt = $mysqli->prepare("
             SELECT 
@@ -284,7 +409,8 @@ class DBController {
         ];
     }
 
-    public static function getSimilarProducts(string $type, int $excludeId, int $limit = 4): array {
+    public static function getSimilarProducts(string $type, int $excludeId, int $limit = 4): array
+    {
         $mysqli = self::connect();
         $stmt = $mysqli->prepare("
             SELECT 
@@ -323,24 +449,41 @@ class DBController {
         return $out;
     }
 
-    
-    private function CreateUserTableIfNotExists(): void {
+    public static function getAvatarByUser(int $id): string
+    {
+        $mysqli = self::connect();
+        $stmt = $mysqli->prepare("SELECT avatar FROM users WHERE id = ? LIMIT 1");
+        if (!$stmt) { $mysqli->close(); return ''; }
+        $stmt->bind_param('i', $id);
+        $stmt->execute();
+        $res = $stmt->get_result();
+        $row = $res ? $res->fetch_assoc() : null;
+        $stmt->close();
+        $mysqli->close();
+        if ($row && !empty($row['avatar'])) return $row['avatar'];
+        return '';
+    }
+
+    // --- table creation ---
+    private static function CreateUserTableIfNotExists(): void
+    {
         $mysqli = self::connect();
         $query = "CREATE TABLE IF NOT EXISTS users (
             id INT AUTO_INCREMENT PRIMARY KEY,
-            username VARCHAR(30) NOT NULL UNIQUE,
-            email VARCHAR(100) NOT NULL UNIQUE,
+            username VARCHAR(60) NOT NULL UNIQUE,
+            email VARCHAR(150) NOT NULL UNIQUE,
             password VARCHAR(255) NOT NULL,
             avatar VARCHAR(255) DEFAULT '',
-            descr TEXT DEFAULT ''
-            contacts TEXT DEFAULT ''
+            descr TEXT DEFAULT '',
+            contacts TEXT DEFAULT '',
             officialCreator TINYINT(1) DEFAULT 0
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
         $mysqli->query($query);
         $mysqli->close();
     }
 
-    private function CreateContentTableIfNotExists(): void {
+    private static function CreateContentTableIfNotExists(): void
+    {
         $mysqli = self::connect();
         $query = "CREATE TABLE IF NOT EXISTS content (
             id INT(11) AUTO_INCREMENT PRIMARY KEY,
@@ -352,6 +495,20 @@ class DBController {
             images TEXT DEFAULT '',
             author INT NOT NULL,
             FOREIGN KEY (author) REFERENCES users(id) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+        $mysqli->query($query);
+        $mysqli->close();
+    }
+
+    private static function CreateSavedTableIfNotExists(): void
+    {
+        $mysqli = self::connect();
+        $query = "CREATE TABLE IF NOT EXISTS saved (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            id_user INT NOT NULL,
+            saved TEXT DEFAULT '',
+            buy TEXT DEFAULT '',
+            FOREIGN KEY (id_user) REFERENCES users(id) ON DELETE CASCADE
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
         $mysqli->query($query);
         $mysqli->close();

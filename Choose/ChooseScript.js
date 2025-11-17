@@ -91,7 +91,6 @@ async function renderProductPage() {
       document.querySelectorAll('.chooseProduct').forEach(btn => {
         btn.addEventListener('click', (e) => {
           const nid = btn.getAttribute('data-id');
-          // Перейти на страницу товара с id
           window.location.href = `ChooseProduct.html?id=${encodeURIComponent(nid)}`;
         });
       });
@@ -106,31 +105,55 @@ async function renderProductPage() {
       });
     }
 
+    const buyBtn = document.querySelector('.buyButton');
+    if (buyBtn) {
+      buyBtn.onclick = async () => {
+        try {
+          const resp = await fetch('../Save/AddToBuy.php', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ id: parseInt(id, 10) })
+          });
+          const j = await resp.json();
+          if (resp.ok && j.success) {
+            alert('Товар добавлен в библиотеку');
+          } else {
+            alert(j.error || 'Ошибка добавления');
+          }
+        } catch (err) {
+          console.error(err);
+          alert('Ошибка сети');
+        }
+      };
+    }
+
+    const favBtn = document.querySelector('.favButton');
+    if (favBtn) {
+      favBtn.onclick = async () => {
+        try {
+          const resp = await fetch('../Save/AddToSave.php', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ id: parseInt(id, 10) })
+          });
+          const j = await resp.json();
+          if (resp.ok && j.success) {
+            alert('Товар добавлен в избранное');
+          } else {
+            alert(j.error || 'Ошибка добавления');
+          }
+        } catch (err) {
+          console.error(err);
+          alert('Ошибка сети');
+        }
+      };
+    }
+
   } catch (err) {
     console.error('Error loading product:', err);
   }
 }
 
 document.addEventListener('DOMContentLoaded', renderProductPage);
-
-document.querySelector('.buyButton').addEventListener('click', () => {
-  const id = localStorage.getItem('selectedProductId');
-  let bought = JSON.parse(localStorage.getItem('boughtProducts') || '[]');
-  if (!bought.includes(id)) {
-    bought.push(id);
-    localStorage.setItem('boughtProducts', JSON.stringify(bought));
-  }
-  alert('Товар добавлен в библиотеку!');
-});
-
-document.querySelector('.favButton').addEventListener('click', () => {
-  const id = localStorage.getItem('selectedProductId');
-  let favs = JSON.parse(localStorage.getItem('favProducts') || '[]');
-  if (!favs.includes(id)) {
-    favs.push(id);
-    localStorage.setItem('favProducts', JSON.stringify(favs));
-    alert('Товар добавлен в избранное!');
-  } else {
-    alert('Товар уже в избранном!');
-  }
-});
