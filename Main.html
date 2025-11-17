@@ -14,19 +14,16 @@
             <h3>Категории</h3>
             <ul id="categoryList">
                 <li data-category="Все">Все</li>
-                <li data-category="Игры">Игры</li>
-                <li data-category="Приложение">Приложения</li>
-                <li data-category="Книги">Книги</li>
+                <li data-category="Игра">Игра</li>
+                <li data-category="Приложение">Приложение</li>
+                <li data-category="Книга">Книга</li>
             </ul>
         </aside>
         <main>
             <div class="searchSortBar" >
-                <input type="text" id="searchInput" placeholder="Поиск товара..." style="flex:1;padding:8px;">
-                <select id="sortSelect" style="padding:8px;">
-                    <option value="title">По названию</option>
-                    <option value="author">По автору</option>
-                </select>
-                <div id="resultCount"></div>
+                <input type="text" id="searchInput" placeholder="'GTA5', 'Google Play'..." style="flex:1;padding:8px;">
+                <button id="searchBtn" >Найти</button>
+                <div id="resultCount" style="margin-left:16px;"></div>
             </div>
             <div class="products-row"></div>
         </main>

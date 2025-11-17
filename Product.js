@@ -22,9 +22,19 @@ class Product {
 
 export const products = [];
 
-export async function getProducts(page = 1) {
+export async function getProducts(page = 1, options = {}) {
+  const q = options.q ? encodeURIComponent(options.q) : null;
+  const category = options.category ? encodeURIComponent(options.category) : null;
+  const sort = options.sort ? encodeURIComponent(options.sort) : null;
+  const author = options.author ? encodeURIComponent(options.author) : null;
+  let url = `getProducts.php?page=${page}&limit=20`;
+  if (q) url += `&q=${q}`;
+  if (category) url += `&category=${category}`;
+  if (sort) url += `&sort=${sort}`;
+  if (author) url += `&author=${author}`;
+
   try {
-    const response = await fetch(`getProducts.php?page=${page}&limit=20`);
+    const response = await fetch(url);
     if (!response.ok) throw new Error('Network error');
     const data = await response.json();
     return {

@@ -7,44 +7,65 @@ for (let btn of buttons) {
 
 import { getProducts } from './Product.js';
 
-let currentProducts = [];
+let allProducts = [];
+let visibleProducts = [];
 let currentPage = 1;
 let totalPages = 1;
 let selectedCategory = "Все";
+let searchTerm = '';
+let debounceTimer = null;
+let currentSort = null;
 
 async function loadProducts(page = 1) {
-    const data = await getProducts(page);
-    currentProducts = data.products;
+    const opts = {
+        q: searchTerm || null,
+        category: selectedCategory && selectedCategory !== 'Все' ? selectedCategory : null,
+        sort: currentSort || null
+    };
+    const data = await getProducts(page, opts);
+    allProducts = data.products;
     currentPage = data.page;
     totalPages = data.pages;
+    applyFiltersAndRender(); 
+}
+
+function applyFiltersAndRender() {
+
+    visibleProducts = allProducts.slice();
     renderProducts();
 }
 
 function renderProducts() {
     const row = document.querySelector('.products-row');
+    if (!row) return;
     row.innerHTML = '';
 
-    currentProducts.forEach(product => {
-        row.innerHTML += `
-            <div class="product-card">
-                <img src="${product.mainImage}" alt="${product.title}">
-                <h4>${product.title}</h4>
-                <div class="product-author">
-                    <img src="${product.author.avatar || 'Profile/profile.png'}" alt="Аватар автора">
-                    <a href="#" class="author-link" data-author-id="${product.author.id}">${product.author.name}</a>
+    const listToShow = visibleProducts;
+    if (listToShow.length === 0) {
+        row.innerHTML = '<div style="padding:24px;color:#666;">Товары не найдены</div>';
+    } else {
+        listToShow.forEach(product => {
+            row.innerHTML += `
+                <div class="product-card">
+                    <img src="${product.mainImage ? ('../WebSite/' + product.mainImage) : 'Profile/profile.png'}" alt="${product.title}">
+                    <h4>${product.title}</h4>
+                    <div class="product-author">
+                        <img src="${product.author && product.author.avatar ? ('../WebSite/' + product.author.avatar) : 'Profile/profile.png'}" alt="Аватар автора">
+                        <a href="#" class="author-link" data-author-id="${product.author && product.author.id ? product.author.id : ''}">${product.author && product.author.name ? product.author.name : 'Автор'}</a>
+                    </div>
+                    <h5>Цена: ${product.price} руб.</h5>
+                    <p>${product.description}</p>
+                    <button class="chooseProduct" data-id="${product.id}">Посмотреть</button>
                 </div>
-                <h5>Цена: ${product.price} руб.</h5>
-                <p>${product.description}</p>
-                <button class="chooseProduct" data-id="${product.id}">Посмотреть</button>
-            </div>
-        `;
-    });
+            `;
+        });
+    }
 
     const paginationHtml = `
         <div class="pagination" style="margin-top:20px;text-align:center;">
-            ${currentPage > 1 ? `<button onclick="prevPage()">←</button>` : ''}
+            ${currentPage > 1 ? `<button onclick="prevPage()"><</button>` : ''}
             <span>Страница ${currentPage} из ${totalPages}</span>
-            ${currentPage < totalPages ? `<button onclick="nextPage()">→</button>` : ''}
+            ${currentPage < totalPages ? `<button onclick="nextPage()">></button>` : ''}
         </div>
     `;
     row.insertAdjacentHTML('beforeend', paginationHtml);
@@ -52,7 +73,6 @@ function renderProducts() {
     document.querySelectorAll('.chooseProduct').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const id = btn.getAttribute('data-id');
-            // Переходим на страницу товара с параметром id
             window.location.href = `./Choose/ChooseProduct.html?id=${encodeURIComponent(id)}`;
         });
     });
@@ -61,13 +81,15 @@ function renderProducts() {
         link.addEventListener('click', (e) => {
             e.preventDefault();
             const authorId = link.getAttribute('data-author-id');
-            localStorage.setItem('selectedAuthorId', authorId);
-            window.location.href = './Profile/profile.html';
+            if (authorId) {
+                localStorage.setItem('selectedAuthorId', authorId);
+                window.location.href = './Profile/profile.html';
+            }
         });
     });
 
     const rc = document.getElementById('resultCount');
-    if (rc) rc.innerText = `Найдено товаров: ${currentProducts.length}`;
+    if (rc) rc.innerText = `Найдено товаров: ${visibleProducts.length}`;
 }
 
 window.prevPage = () => {
@@ -78,21 +100,37 @@ window.nextPage = () => {
     if (currentPage < totalPages) loadProducts(currentPage + 1);
 };
 
+function debounce(fn, ms = 300) {
+    return (...args) => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => fn(...args), ms);
+    };
+}
+
+function filterAndSortProducts() {
+    const si = document.getElementById('searchInput');
+    const ss = document.getElementById('sortSelect');
+    searchTerm = si ? si.value.trim() : '';
+    currentSort = ss ? ss.value : null;
+    loadProducts(1);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     loadProducts();
 
     const si = document.getElementById('searchInput');
     const ss = document.getElementById('sortSelect');
-    if (si) si.addEventListener('input', filterAndSortProducts);
+    const sbtn = document.getElementById('searchBtn');
+    if (si) si.addEventListener('input', debounce(filterAndSortProducts, 300));
+    if (sbtn) sbtn.addEventListener('click', () => filterAndSortProducts());
     if (ss) ss.addEventListener('change', filterAndSortProducts);
 
     document.querySelectorAll('#categoryList li').forEach(li => {
         li.addEventListener('click', () => {
-            selectedCategory = li.getAttribute('data-category');
-            loadProducts(1);
-            document.querySelectorAll('#categoryList li').forEach(el =>
-                el.style.color = '');
+            selectedCategory = li.getAttribute('data-category') || 'Все';
+            document.querySelectorAll('#categoryList li').forEach(el => el.style.color = '');
             li.style.color = '#ed4956';
+            loadProducts(1);
         });
     });
 });

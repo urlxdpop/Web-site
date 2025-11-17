@@ -79,6 +79,15 @@ header {
     color: #ed4956;
 }
 
+.searchBtn {
+    padding: 8px 12px;
+    margin-left: 8px;
+    border-radius: 6px;
+    border: 1px solid #dbdbdb;
+    background: #fff;
+    cursor: pointer;
+}
+
 main {
     flex: 1;
 }

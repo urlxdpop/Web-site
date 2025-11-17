@@ -103,45 +103,215 @@ class DBController {
         return (bool)$ok;
     }
 
-    public static function getProducts(int $page = 1, int $limit = 20, ?int $author = null): array {
-        $offset = ($page - 1) * $limit;
+    public static function getProducts(int $page = 1, int $limit = 20, ?int $author = null, ?string $q = null, ?string $category = null, ?string $sort = null): array {
+        $offset = max(0, ($page - 1) * $limit);
         $mysqli = self::connect();
 
+        $where = [];
+        $types = '';
+        $params = [];
+
         if ($author !== null) {
-            $stmt = $mysqli->prepare("
-                SELECT c.*, u.username as author_name, u.avatar as author_avatar, u.descr as author_desc 
-                FROM content c 
-                LEFT JOIN users u ON c.author = u.id 
-                WHERE c.author = ?
-                ORDER BY c.id DESC 
-                LIMIT ? OFFSET ?");
-            if (!$stmt) { $mysqli->close(); return []; }
-            $stmt->bind_param('iii', $author, $limit, $offset);
-        } else {
-            $stmt = $mysqli->prepare("
-                SELECT c.*, u.username as author_name, u.avatar as author_avatar, u.descr as author_desc 
-                FROM content c 
-                LEFT JOIN users u ON c.author = u.id 
-                ORDER BY c.id DESC 
-                LIMIT ? OFFSET ?");
-            if (!$stmt) { $mysqli->close(); return []; }
-            $stmt->bind_param('ii', $limit, $offset);
+            $where[] = 'c.author = ?';
+            $types .= 'i';
+            $params[] = $author;
         }
+
+        if ($category !== null && $category !== '' && mb_strtolower($category) !== 'все') {
+            $where[] = 'c.type = ?';
+            $types .= 's';
+            $params[] = $category;
+        }
+
+        if ($q !== null && $q !== '') {
+            $where[] = '(c.title LIKE ? OR c.description LIKE ? OR u.username LIKE ?)';
+            $types .= 'sss';
+            $like = '%' . $q . '%';
+            $params[] = $like;
+            $params[] = $like;
+            $params[] = $like;
+        }
+
+        $whereSql = $where ? 'WHERE ' . implode(' AND ', $where) : '';
+
+        $orderBy = 'c.id DESC';
+        if ($sort === 'title') $orderBy = 'c.title ASC';
+        elseif ($sort === 'price_asc') $orderBy = 'c.price ASC';
+        elseif ($sort === 'price_desc') $orderBy = 'c.price DESC';
+        elseif ($sort === 'author') $orderBy = 'u.username ASC';
+
+        $sql = "
+            SELECT c.id, c.title, c.mainImage, c.type, c.price, c.description, c.images, c.author,
+                   u.username AS author_name, u.avatar AS author_avatar, u.descr AS author_desc
+            FROM content c
+            LEFT JOIN users u ON c.author = u.id
+            {$whereSql}
+            ORDER BY {$orderBy}
+            LIMIT ? OFFSET ?
+        ";
+
+        $types .= 'ii';
+        $params[] = $limit;
+        $params[] = $offset;
+
+        $stmt = $mysqli->prepare($sql);
+        if (!$stmt) { $mysqli->close(); return []; }
+
+        $bind_names = [];
+        $bind_names[] = $types;
+        for ($i = 0; $i < count($params); $i++) {
+            $bind_names[] = & $params[$i];
+        }
+        call_user_func_array([$stmt, 'bind_param'], $bind_names);
 
         $stmt->execute();
         $result = $stmt->get_result();
         $products = [];
+        if ($result) {
+            while ($row = $result->fetch_assoc()) {
+                $products[] = [
+                    'id' => (int)$row['id'],
+                    'title' => $row['title'],
+                    'mainImage' => $row['mainImage'],
+                    'type' => $row['type'],
+                    'price' => (float)$row['price'],
+                    'description' => $row['description'],
+                    'images' => $row['images'] ? json_decode($row['images'], true) : [],
+                    'author' => [
+                        'id' => (int)$row['author'],
+                        'name' => $row['author_name'],
+                        'desc' => $row['author_desc'],
+                        'avatar' => $row['author_avatar']
+                    ]
+                ];
+            }
+        }
+
+        $stmt->close();
+        $mysqli->close();
+        return $products;
+    }
+
+    public static function getProductsCount(?int $author = null, ?string $q = null, ?string $category = null): int {
+        $mysqli = self::connect();
+
+        $where = [];
+        $types = '';
+        $params = [];
+
+        if ($author !== null) {
+            $where[] = 'author = ?';
+            $types .= 'i';
+            $params[] = $author;
+        }
+
+        if ($category !== null && $category !== '' && mb_strtolower($category) !== 'все') {
+            $where[] = 'type = ?';
+            $types .= 's';
+            $params[] = $category;
+        }
+
+        if ($q !== null && $q !== '') {
+            $where[] = '(content.title LIKE ? OR content.description LIKE ? OR users.username LIKE ?)';
+
+            $types .= 'sss';
+            $like = '%' . $q . '%';
+            $params[] = $like;
+            $params[] = $like;
+            $params[] = $like;
+            $sql = "SELECT COUNT(*) AS cnt FROM content LEFT JOIN users ON content.author = users.id WHERE " . implode(' AND ', $where);
+        } else {
+            $sql = $where ? "SELECT COUNT(*) AS cnt FROM content WHERE " . implode(' AND ', $where) : "SELECT COUNT(*) AS cnt FROM content";
+        }
+
+        $stmt = $mysqli->prepare($sql);
+        if (!$stmt) {
+            $mysqli->close();
+            return 0;
+        }
+
+        if (count($params) > 0) {
+            $bind_names = [];
+            $bind_names[] = $types;
+            for ($i = 0; $i < count($params); $i++) {
+                $bind_names[] = & $params[$i];
+            }
+            call_user_func_array([$stmt, 'bind_param'], $bind_names);
+        }
+
+        $stmt->execute();
+        $res = $stmt->get_result();
+        $row = $res ? $res->fetch_assoc() : null;
+        $stmt->close();
+        $mysqli->close();
+        return (int)($row['cnt'] ?? 0);
+    }
+
+
+    public static function getProductById(int $id): ?array {
+        $mysqli = self::connect();
+        $stmt = $mysqli->prepare("
+            SELECT 
+                c.id, c.title, c.mainImage, c.type, c.price, c.description, c.images, c.author,
+                u.username AS author_name, u.avatar AS author_avatar, u.descr AS author_desc, u.email AS author_email
+            FROM content c
+            LEFT JOIN users u ON c.author = u.id
+            WHERE c.id = ?
+            LIMIT 1
+        ");
+        if (!$stmt) { $mysqli->close(); return null; }
+        $stmt->bind_param('i', $id);
+        $stmt->execute();
+        $row = $stmt->get_result()->fetch_assoc() ?: null;
+        $stmt->close();
+        $mysqli->close();
+        if (!$row) return null;
+        return [
+            'id' => (int)$row['id'],
+            'title' => $row['title'],
+            'mainImage' => $row['mainImage'],
+            'type' => $row['type'],
+            'price' => (float)$row['price'],
+            'description' => $row['description'],
+            'images' => $row['images'] ? json_decode($row['images'], true) : [],
+            'author' => [
+                'id' => (int)$row['author'],
+                'name' => $row['author_name'],
+                'desc' => $row['author_desc'],
+                'avatar' => $row['author_avatar'],
+                'email' => $row['author_email']
+            ]
+        ];
+    }
+
+    public static function getSimilarProducts(string $type, int $excludeId, int $limit = 4): array {
+        $mysqli = self::connect();
+        $stmt = $mysqli->prepare("
+            SELECT 
+                c.id, c.title, c.mainImage, c.type, c.price, c.description, c.images, c.author,
+                u.username AS author_name, u.avatar AS author_avatar, u.descr AS author_desc
+            FROM content c
+            LEFT JOIN users u ON c.author = u.id
+            WHERE c.type = ? AND c.id != ?
+            ORDER BY RAND()
+            LIMIT ?
+        ");
+        if (!$stmt) { $mysqli->close(); return []; }
+        $stmt->bind_param('sii', $type, $excludeId, $limit);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $out = [];
         while ($row = $result->fetch_assoc()) {
-            $products[] = [
-                'id' => $row['id'],
+            $out[] = [
+                'id' => (int)$row['id'],
                 'title' => $row['title'],
                 'mainImage' => $row['mainImage'],
                 'type' => $row['type'],
-                'price' => $row['price'],
+                'price' => (float)$row['price'],
                 'description' => $row['description'],
-                'images' => json_decode($row['images'], true),
+                'images' => $row['images'] ? json_decode($row['images'], true) : [],
                 'author' => [
-                    'id' => $row['author'],
+                    'id' => (int)$row['author'],
                     'name' => $row['author_name'],
                     'desc' => $row['author_desc'],
                     'avatar' => $row['author_avatar']
@@ -150,29 +320,10 @@ class DBController {
         }
         $stmt->close();
         $mysqli->close();
-        return $products;
+        return $out;
     }
 
-    public static function getProductsCount(?int $author = null): int {
-        $mysqli = self::connect();
-        if ($author !== null) {
-            $stmt = $mysqli->prepare("SELECT COUNT(*) as cnt FROM content WHERE author = ?");
-            if (!$stmt) { $mysqli->close(); return 0; }
-            $stmt->bind_param('i', $author);
-            $stmt->execute();
-            $res = $stmt->get_result()->fetch_assoc();
-            $stmt->close();
-            $mysqli->close();
-            return (int)($res['cnt'] ?? 0);
-        } else {
-            $result = $mysqli->query("SELECT COUNT(*) as cnt FROM content");
-            if (!$result) { $mysqli->close(); return 0; }
-            $row = $result->fetch_assoc();
-            $mysqli->close();
-            return (int)($row['cnt'] ?? 0);
-        }
-    }
-
+    
     private function CreateUserTableIfNotExists(): void {
         $mysqli = self::connect();
         $query = "CREATE TABLE IF NOT EXISTS users (

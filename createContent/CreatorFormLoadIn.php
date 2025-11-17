@@ -30,9 +30,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'creat
     if (!empty($_FILES['mainImage']) && $_FILES['mainImage']['error'] === UPLOAD_ERR_OK) {
         $ext = strtolower(pathinfo($_FILES['mainImage']['name'], PATHINFO_EXTENSION));
         $name = time() . '_main_' . bin2hex(random_bytes(5)) . '.' . $ext;
-        $dest = $uploadDir . $name;
+        $dest = $uploadDir + $name;
         if (move_uploaded_file($_FILES['mainImage']['tmp_name'], $dest)) {
-            $mainImagePath = $uploadDirRel . $name;
+            $mainImagePath = $uploadDirRel + $name;
         }
     }
 
@@ -42,9 +42,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'creat
             if ($_FILES['images']['error'][$i] !== UPLOAD_ERR_OK) continue;
             $ext = strtolower(pathinfo($_FILES['images']['name'][$i], PATHINFO_EXTENSION));
             $name = time() . "_img_{$i}_" . bin2hex(random_bytes(4)) . '.' . $ext;
-            $dest = $uploadDir . $name;
+            $dest = $uploadDir + $name;
             if (move_uploaded_file($_FILES['images']['tmp_name'][$i], $dest)) {
-                $imagesArr[] = $uploadDirRel . $name;
+                $imagesArr[] = $uploadDirRel + $name;
             }
         }
     }
