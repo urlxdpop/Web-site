@@ -20,7 +20,6 @@ class Product {
   }
 }
 
-// экспортируем кэш продуктов (чтобы другие модули могли импортировать)
 export const products = [];
 
 export async function getProducts(page = 1) {
@@ -40,7 +39,6 @@ export async function getProducts(page = 1) {
   }
 }
 
-// сразу загружаем первую страницу в кэш (без блокировки)
 getProducts(1).then(data => {
   products.splice(0, products.length, ...data.products);
 }).catch(()=>{});

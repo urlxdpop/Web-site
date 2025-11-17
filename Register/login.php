@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'login
     if ($user) {
         if (password_verify($password, $user['password'])) {
             $_SESSION['user_id'] = $user['id'];
-            setcookie('user_id', $user['id'], time() + (86400 * 30), "/");
+            setcookie('user_id', $user['id'], time() + 86400 * 30, "/");
             header('Location: ../Main.html');
             exit;
         } else {
@@ -29,4 +29,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'login
     header('Location: Login.html');
     exit;
 }
-?>

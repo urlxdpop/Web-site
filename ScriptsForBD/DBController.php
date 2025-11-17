@@ -9,6 +9,11 @@ class DBController {
         'charset' => 'utf8mb4'
     ];
 
+    private function __construct() {
+        $this->CreateUserTableIfNotExists();
+        $this->CreateContentTableIfNotExists();
+    }
+
     public static function connect(): mysqli {
         $c = new mysqli(self::$cfg['host'], self::$cfg['user'], self::$cfg['pass'], self::$cfg['db'], self::$cfg['port']);
         if ($c->connect_error) {
@@ -166,6 +171,39 @@ class DBController {
             $mysqli->close();
             return (int)($row['cnt'] ?? 0);
         }
+    }
+
+    private function CreateUserTableIfNotExists(): void {
+        $mysqli = self::connect();
+        $query = "CREATE TABLE IF NOT EXISTS users (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            username VARCHAR(30) NOT NULL UNIQUE,
+            email VARCHAR(100) NOT NULL UNIQUE,
+            password VARCHAR(255) NOT NULL,
+            avatar VARCHAR(255) DEFAULT '',
+            descr TEXT DEFAULT ''
+            contacts TEXT DEFAULT ''
+            officialCreator TINYINT(1) DEFAULT 0
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+        $mysqli->query($query);
+        $mysqli->close();
+    }
+
+    private function CreateContentTableIfNotExists(): void {
+        $mysqli = self::connect();
+        $query = "CREATE TABLE IF NOT EXISTS content (
+            id INT(11) AUTO_INCREMENT PRIMARY KEY,
+            title VARCHAR(255) NOT NULL,
+            mainImage VARCHAR(255) DEFAULT '',
+            type VARCHAR(30) NOT NULL,
+            price DECIMAL(10,2) NOT NULL,
+            description TEXT DEFAULT '',
+            images TEXT DEFAULT '',
+            author INT NOT NULL,
+            FOREIGN KEY (author) REFERENCES users(id) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+        $mysqli->query($query);
+        $mysqli->close();
     }
 }
 ?>
