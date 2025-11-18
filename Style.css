@@ -1,13 +1,13 @@
 body {
-    background: #fafafa;
+    background: #1a005b;
     font-family: 'Segoe UI', Arial, sans-serif;
     margin: 0;
-    color: #262626;
+    color: #ececec;
 }
 
 header {
-    background: #fff;
-    border-bottom: 1px solid #dbdbdb;
+    background: #07008d;
+    border-bottom: 1px solid #000339;
     padding: 16px 0;
 }
 
@@ -18,18 +18,18 @@ header {
 }
 
 .top-bar button {
-    background: #fff;
-    border: 1px solid #dbdbdb;
+    background: #e800d4;
+    border: 1px solid #8b00a6;
     border-radius: 6px;
     padding: 8px 20px;
     font-size: 1rem;
-    color: #262626;
+    color: #f2f2f2;
     cursor: pointer;
     transition: background 0.2s, box-shadow 0.2s;
 }
 
 .top-bar button:hover {
-    background: #f1f1f1;
+    background: #e311ff;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
@@ -41,8 +41,8 @@ header {
 }
 
 .sidebar {
-    background: #fff;
-    border: 1px solid #dbdbdb;
+    background: #002f8c;
+    border: 1px solid #200174;
     border-radius: 8px;
     padding: 24px 16px;
     width: 180px;
@@ -53,7 +53,7 @@ header {
 .sidebar h3 {
     margin-top: 0;
     font-size: 1.1rem;
-    color: #555;
+    color: #e8e8e8;
     margin-bottom: 12px;
 }
 
@@ -65,7 +65,7 @@ header {
 
 .sidebar ul li {
     padding: 8px 0;
-    border-bottom: 1px solid #f1f1f1;
+    border-bottom: 1px solid #15016c;
     font-size: 1rem;
     cursor: pointer;
     transition: color 0.2s;
@@ -83,8 +83,8 @@ header {
     padding: 8px 12px;
     margin-left: 8px;
     border-radius: 6px;
-    border: 1px solid #dbdbdb;
-    background: #fff;
+    border: 1px solid #00e7ef;
+    background: #0089bf;
     cursor: pointer;
 }
 
@@ -100,8 +100,8 @@ main {
 }
 
 .product-card {
-    background: #fff;
-    border: 1px solid #dbdbdb;
+    background: #006797;
+    border: 1px solid #007d99;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     padding: 16px;
@@ -124,18 +124,18 @@ main {
     object-fit: cover;
     border-radius: 6px;
     margin-bottom: 12px;
-    border: 1px solid #eee;
+    border: 1px solid #0061a2;
 }
 
 .product-card h4 {
     margin: 0 0 8px 0;
     font-size: 1.1rem;
-    color: #262626;
+    color: #e2e2e2;
 }
 
 .product-card p {
     font-size: 0.95rem;
-    color: #555;
+    color: #efefef;
     margin: 0 0 12px 0;
     text-align: center;
 }
@@ -156,13 +156,13 @@ main {
 }
 
 footer {
-    background: #fff;
-    border-top: 1px solid #dbdbdb;
+    background: #000631;
+    border-top: 1px solid #000000;
     margin-top: 40px;
     padding: 24px 0;
     text-align: center;
     font-size: 0.95rem;
-    color: #888;
+    color: #b8ebff;
 }
 
 .footer-info p {
@@ -173,7 +173,6 @@ iframe {
     width: 100%;
     border: none;
     overflow: hidden;
-    /* Полосы прокрутки будут скрыты */
 }
 
 .product-author {
@@ -187,12 +186,12 @@ iframe {
     width: 28px;
     height: 28px;
     border-radius: 50%;
-    border: 1px solid #dbdbdb;
+    border: 1px solid #160079;
     object-fit: cover;
 }
 
 .product-author a {
-    color: #ed4956;
+    color: #ff00f7;
     text-decoration: none;
     font-size: 0.98rem;
     font-weight: 500;
@@ -200,7 +199,7 @@ iframe {
 }
 
 .product-author a:hover {
-    color: #d7374a;
+    color: #c70017;
     text-decoration: underline;
 }
 
@@ -208,4 +207,45 @@ iframe {
     display: flex;
     gap: 16px;
     margin-bottom: 16px;
+}
+
+.searchSortBar #searchInput {
+  flex: 1;
+  padding: 8px;
+}
+
+#resultCount {
+  margin-left: 16px;
+}
+
+.pagination {
+  margin-top: 20px;
+  text-align: center;
+}
+
+#categoryList li.active {
+  color: #ed4956;
+}
+
+.no-results {
+  padding: 24px;
+  color: #e7e7e7;
+}
+
+.muted-msg {
+  padding: 12px;
+  color: #f0f0f0;
+}
+
+.total-summary {
+  margin: 16px 0;
+  font-weight: bold;
+}
+
+.top-bar img#accountBtn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 1px solid #240274;
 }

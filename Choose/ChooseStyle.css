@@ -1,8 +1,8 @@
 .product-container {
     max-width: 800px;
     margin: 40px auto;
-    background: #fff;
-    border: 1px solid #dbdbdb;
+    background: #0000d6;
+    border: 1px solid #020060;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     padding: 32px 24px;
@@ -20,14 +20,14 @@
     height: 240px;
     object-fit: cover;
     border-radius: 8px;
-    border: 1px solid #eee;
+    border: 1px solid #10006a;
 }
 
 .slider-btn {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    background: #fff;
+    background: #ffffff;
     border: 1px solid #dbdbdb;
     border-radius: 50%;
     width: 36px;
@@ -40,7 +40,7 @@
 }
 
 .slider-btn:hover {
-    background: #f1f1f1;
+    background: #b1b1b1;
 }
 
 .slider-btn.left {
@@ -59,24 +59,24 @@
     font-size: 1.5rem;
     font-weight: bold;
     margin-bottom: 12px;
-    color: #262626;
+    color: #f0f0f0;
 }
 
 .product-desc {
     font-size: 1.05rem;
-    color: #555;
+    color: #e7e7e7;
     margin-bottom: 16px;
 }
 
 .product-contacts {
     font-size: 1rem;
-    color: #888;
+    color: #cfcfcf;
     margin-bottom: 8px;
 }
 
 .similar-title {
     font-size: 1.2rem;
-    color: #262626;
+    color: #d7d7d7;
     margin-bottom: 16px;
     font-weight: 600;
 }
@@ -89,8 +89,8 @@
 }
 
 .similar-card {
-    background: #fff;
-    border: 1px solid #dbdbdb;
+    background: #0065d9;
+    border: 1px solid #003aaf;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     padding: 16px;
@@ -124,12 +124,12 @@
 .similar-card h4 {
     margin: 0 0 6px 0;
     font-size: 1rem;
-    color: #262626;
+    color: #eaeaea;
 }
 
 .similar-card p {
     font-size: 0.92rem;
-    color: #555;
+    color: #f0f0f0;
     margin: 0 0 8px 0;
     text-align: center;
 }
@@ -171,12 +171,12 @@
 .author-block .author-name {
     font-weight: 600;
     font-size: 1.1rem;
-    color: #262626;
+    color: #f5f5f5;
 }
 
 .author-block .author-desc {
     font-size: 0.98rem;
-    color: #888;
+    color: #ffc6c6;
 }
 
 .author-a {

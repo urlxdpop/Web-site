@@ -1,9 +1,9 @@
-/* Стили формы создания товара */
+
 .create-container {
   max-width: 800px;
   margin: 40px auto;
-  background: #fff;
-  border: 1px solid #dbdbdb;
+  background: #2e00e6;
+  border: 1px solid #1e0089;
   border-radius: 8px;
   padding: 24px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.04);
@@ -12,21 +12,20 @@
 .create-container h2 {
   margin-top: 0;
   margin-bottom: 16px;
-  color: #262626;
+  color: #ffffff;
 }
 
 #createForm label {
   display: block;
   margin-bottom: 12px;
   font-size: 0.95rem;
-  color: #444;
+  color: #dfdfdf;
 }
 
-#createForm input[type="text"],
-#createForm input[type="number"],
+
 #createForm select,
 #createForm textarea,
-#createForm input[type="file"] {
+#createForm input{
   display: block;
   width: 100%;
   margin-top: 6px;

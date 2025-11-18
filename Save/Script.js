@@ -15,7 +15,7 @@ async function renderLibrary() {
     try {
         const resp = await fetch('LoadSaved.php', { credentials: 'same-origin' });
         if (!resp.ok) {
-            row.innerHTML = '<div style="padding:24px;color:#666;">Ошибка загрузки библиотеки</div>';
+            row.innerHTML = '<div class="no-results">Ошибка загрузки библиотеки</div>';
             return;
         }
         const data = await resp.json();
@@ -36,9 +36,9 @@ async function renderLibrary() {
                 `;
             });
             const total = boughtProducts.reduce((sum, p) => sum + (p.price || 0), 0);
-            row.innerHTML += `<aside class="sidebar right"><div style="margin:16px 0;font-weight:bold;">Общая сумма: ${total} руб.</div></aside>`;
+            row.innerHTML += `<aside class="sidebar right"><div class="total-summary">Общая сумма: ${total} руб.</div></aside>`;
         } else {
-            row.innerHTML += `<div style="padding:12px;color:#666;">Покупок нет</div>`;
+            row.innerHTML += `<div class="muted-msg">Покупок нет</div>`;
         }
 
         row.innerHTML += `<div class="divider"></div>`;
@@ -56,9 +56,9 @@ async function renderLibrary() {
                 `;
             });
             const totalFav = favProducts.reduce((sum, p) => sum + (p.price || 0), 0);
-            row.innerHTML += `<aside class="sidebar right"><div style="margin:16px 0;font-weight:bold;">Общая сумма: ${totalFav} руб.</div></aside>`;
+            row.innerHTML += `<aside class="sidebar right"><div class="total-summary">Общая сумма: ${totalFav} руб.</div></aside>`;
         } else {
-            row.innerHTML += `<div style="padding:12px;color:#666;">Избранных товаров нет</div>`;
+            row.innerHTML += `<div class="muted-msg">Избранных товаров нет</div>`;
         }
 
         document.querySelectorAll('.chooseProduct').forEach(btn => {
@@ -70,6 +70,6 @@ async function renderLibrary() {
 
     } catch (err) {
         console.error(err);
-        row.innerHTML = '<div style="padding:24px;color:#666;">Ошибка загрузки библиотеки</div>';
+        row.innerHTML = '<div>Ошибка загрузки библиотеки</div>';
     }
 }

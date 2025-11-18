@@ -26,7 +26,7 @@ if ($userId) {
             <button id="mainBtn" onclick="window.top.location.href='../Main.html'">Рекомендации</button>
             <button id="Save" onclick="window.top.location.href='../Save/Saved.html'">Библиотека</button>
             <?php if ($userId): ?>
-                <img id="accountBtn" src="<?php echo htmlspecialchars($avatarSrc, ENT_QUOTES); ?>" alt="Аватар" style="width:36px;height:36px;border-radius:50%;cursor:pointer;border:1px solid #dbdbdb"
+                <img id="accountBtn" src="<?php echo htmlspecialchars($avatarSrc, ENT_QUOTES); ?>" alt="Аватар"
                      onclick="window.top.location.href='../Profile/MyProfile.html'">
             <?php else: ?>
                 <button id="accountBtn" onclick="window.top.location.href='../Register/Reg.html'">Аккаунт</button>

@@ -42,7 +42,7 @@ function renderProducts() {
 
     const listToShow = visibleProducts;
     if (listToShow.length === 0) {
-        row.innerHTML = '<div style="padding:24px;color:#666;">Товары не найдены</div>';
+        row.innerHTML = '<div class="no-results">Товары не найдены</div>';
     } else {
         listToShow.forEach(product => {
             row.innerHTML += `
@@ -62,7 +62,7 @@ function renderProducts() {
     }
 
     const paginationHtml = `
-        <div class="pagination" style="margin-top:20px;text-align:center;">
+        <div class="pagination">
             ${currentPage > 1 ? `<button onclick="prevPage()"><</button>` : ''}
             <span>Страница ${currentPage} из ${totalPages}</span>
             ${currentPage < totalPages ? `<button onclick="nextPage()">></button>` : ''}
@@ -128,8 +128,8 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('#categoryList li').forEach(li => {
         li.addEventListener('click', () => {
             selectedCategory = li.getAttribute('data-category') || 'Все';
-            document.querySelectorAll('#categoryList li').forEach(el => el.style.color = '');
-            li.style.color = '#ed4956';
+            document.querySelectorAll('#categoryList li').forEach(el => el.classList.remove('active'));
+            li.classList.add('active');
             loadProducts(1);
         });
     });
