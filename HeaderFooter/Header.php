@@ -25,6 +25,7 @@ if ($userId) {
         <div class="top-bar">
             <button id="mainBtn" onclick="window.top.location.href='../Main.html'">Рекомендации</button>
             <button id="Save" onclick="window.top.location.href='../Save/Saved.html'">Библиотека</button>
+            <button onclick="window.top.location.href='../About.html'">О компании</button>
             <?php if ($userId): ?>
                 <img id="accountBtn" src="<?php echo htmlspecialchars($avatarSrc, ENT_QUOTES); ?>" alt="Аватар"
                      onclick="window.top.location.href='../Profile/MyProfile.html'">
